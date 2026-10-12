@@ -1,0 +1,13 @@
+{
+  "name": "null",
+  "private": true,
+  "version": "2.0.0",
+  "description": "NULL is an ai? i think... who knows he could be living.",
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^6.0.2"
+  }
+}
