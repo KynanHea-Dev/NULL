@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ebe8e1">
+<meta name="description" content="NULL — something lives in this empty page. say something to it.">
+<title>NULL</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23ebe8e1'/%3E%3Ccircle cx='32' cy='32' r='15' fill='%23111'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ebe8e1;
+  --ink:#121110;
+  --soft:rgba(18,17,16,.5);
+  --hair:rgba(18,17,16,.14);
+  --sig:#2b2bf0;
+  --serif:"Instrument Serif","Iowan Old Style","Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+body.inv{--paper:#0d0d0c;--ink:#ebe8e1;--soft:rgba(235,232,225,.5);--hair:rgba(235,232,225,.14);--sig:#7a7aff}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--paper);color:var(--ink);transition:background .9s ease,color .9s ease}
+body{font-family:var(--mono);font-size:12px;letter-spacing:.02em;overflow:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--sig);color:var(--paper)}
+
+#presence{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+#grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:1;opacity:.07;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(4) infinite}
+body.inv #grain{mix-blend-mode:screen;opacity:.05}
+@keyframes grain{25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-1%,3%)}}
+
+.frame{position:fixed;inset:0;z-index:2;display:grid;grid-template-rows:auto 1fr auto;
+  padding:max(22px,env(safe-area-inset-top)) clamp(18px,4vw,56px) max(20px,env(safe-area-inset-bottom))}
+
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;text-transform:uppercase;letter-spacing:.14em;font-size:11px}
+.mark{display:flex;gap:14px;align-items:baseline}
+.mark strong{font-family:var(--serif);font-weight:400;font-size:28px;letter-spacing:.02em;text-transform:none;line-height:.8}
+.mark span{color:var(--soft)}
+.meta{display:flex;gap:22px;color:var(--soft);text-align:right;flex-wrap:wrap;justify-content:flex-end}
+.meta button{all:unset;cursor:pointer;color:var(--ink);border-bottom:1px solid transparent;transition:border-color .2s}
+.meta button:hover,.meta button:focus-visible{border-color:var(--ink)}
+#state{color:var(--sig)}
+
+main{position:relative;min-height:0;display:flex;flex-direction:column;justify-content:flex-end}
+#log{overflow-y:auto;scrollbar-width:none;padding:18vh 0 28px;max-width:860px;width:100%;margin:0 auto;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 26%);mask-image:linear-gradient(to bottom,transparent 0,#000 26%)}
+#log::-webkit-scrollbar{display:none}
+.m{margin:0 0 30px;animation:rise .9s cubic-bezier(.2,.7,.1,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px);filter:blur(5px)}}
+.m.null{font-family:var(--serif);font-size:clamp(26px,3.6vw,46px);line-height:1.08;letter-spacing:-.01em;max-width:18em}
+.m.null::before{content:"null";display:block;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);margin-bottom:8px}
+.m.null.quiet{font-style:italic;color:var(--soft)}
+.m.you{font-size:13px;line-height:1.6;text-align:right;margin-left:auto;max-width:34em;color:var(--ink)}
+.m.you::after{content:"— " attr(data-who);display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);margin-top:4px}
+.m.sys{font-size:11px;color:var(--soft);text-align:center;letter-spacing:.12em;text-transform:uppercase}
+.m.sys code{color:var(--ink);font:inherit}
+.cur{display:inline-block;width:.42em;height:.86em;background:var(--sig);vertical-align:-.06em;margin-left:.08em;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.old{opacity:.38;transition:opacity .6s}
+.old:hover{opacity:1}
+
+form{max-width:860px;width:100%;margin:0 auto;display:flex;align-items:center;gap:16px;border-top:1px solid var(--ink);padding-top:14px}
+form label{color:var(--soft);text-transform:uppercase;letter-spacing:.2em;font-size:10px;white-space:nowrap}
+#in{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--ink);font-family:var(--serif);font-size:clamp(20px,2.4vw,28px);padding:6px 0;caret-color:var(--sig)}
+#in::placeholder{color:var(--soft);font-style:italic}
+#send{all:unset;cursor:pointer;font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:10px 0 10px 12px}
+#send:disabled{opacity:.3;cursor:default}
+.hint{max-width:860px;width:100%;margin:10px auto 0;display:flex;justify-content:space-between;color:var(--soft);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+
+@media (max-width:640px){
+  .meta .wide{display:none}
+  .hint span:last-child{display:none}
+  #log{padding-top:12vh}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="presence" aria-hidden="true"></canvas>
+<div id="grain" aria-hidden="true"></div>
+
+<div class="frame">
+  <header>
+    <div class="mark"><strong>NULL</strong><span class="wide">0x4E554C4C</span></div>
+    <div class="meta">
+      <span id="state">listening</span>
+      <span class="wide" id="visit"></span>
+      <span class="wide" id="clock"></span>
+      <button type="button" id="invert" aria-label="invert colours">invert</button>
+      <button type="button" id="forget" aria-label="erase NULL's memory of you">forget</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="log" aria-live="polite"></div>
+    <form id="line" autocomplete="off">
+      <label for="in" id="who">you</label>
+      <input id="in" maxlength="800" placeholder="say something to nothing" spellcheck="false" autofocus>
+      <button id="send" type="submit">send ↵</button>
+    </form>
+    <div class="hint"><span>type <b>/help</b> for the few rules here</span><span>everything you say stays in this browser</span></div>
+  </main>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s);
+const log=$('#log'),inp=$('#in'),form=$('#line'),stateEl=$('#state'),sendBtn=$('#send');
+const store={
+  get(k,d){try{const v=localStorage.getItem('null2.'+k);return v==null?d:JSON.parse(v)}catch{return d}},
+  set(k,v){try{localStorage.setItem('null2.'+k,JSON.stringify(v))}catch{}},
+  wipe(){try{Object.keys(localStorage).filter(k=>k.startsWith('null2.')).forEach(k=>localStorage.removeItem(k))}catch{}}
+};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── memory ── */
+const S={
+  name:store.get('name',''),
+  visits:store.get('visits',0)+1,
+  first:store.get('first',null),
+  hist:store.get('hist',[]),
+  inv:store.get('inv',false),
+  busy:false,idleSent:false,lastInput:Date.now(),hiddenAt:0,
+};
+if(!Array.isArray(S.hist))S.hist=[];
+if(!S.first){S.first=new Date().toISOString();store.set('first',S.first)}
+store.set('visits',S.visits);
+document.body.classList.toggle('inv',S.inv);
+
+const who=()=>S.name||'you';
+$('#who').textContent=who();
+$('#visit').textContent='visit '+String(S.visits).padStart(2,'0');
+const tick=()=>{$('#clock').textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};
+tick();setInterval(tick,15000);
+
+const setState=s=>{stateEl.textContent=s;P.state=s};
+const scroll=()=>{log.scrollTop=log.scrollHeight};
+function fade(){const ms=[...log.children];ms.forEach((m,i)=>m.classList.toggle('old',i<ms.length-4))}
+function add(cls,text,whoName){
+  const d=document.createElement('div');d.className='m '+cls;
+  if(whoName)d.dataset.who=whoName;
+  if(text!=null)d.textContent=text;
+  log.appendChild(d);fade();scroll();return d;
+}
+function sys(html){const d=add('sys');d.innerHTML=html;return d}
+function remember(role,content){
+  S.hist.push({role,content});
+  if(S.hist.length>60)S.hist=S.hist.slice(-60);
+  store.set('hist',S.hist);
+}
+
+/* ── talking to NULL ── */
+async function speak(extra={},quiet=false){
+  S.busy=true;sendBtn.disabled=true;setState('thinking');
+  const el=add('null'+(quiet?' quiet':''),'');
+  const cur=document.createElement('span');cur.className='cur';el.appendChild(cur);
+  const txt=document.createTextNode('');el.insertBefore(txt,cur);
+  let full='';
+  try{
+    const r=await fetch('/api/null',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:S.hist.slice(-30),meta:{name:S.name,visits:S.visits,firstSeen:new Date(S.first).toDateString(),
+        time:new Date().toLocaleString([], {weekday:'long',hour:'2-digit',minute:'2-digit'}),...extra}})});
+    if(!r.ok||!r.body){full=(await r.text().catch(()=>''))||'…';throw 0}
+    setState('speaking');
+    const rd=r.body.getReader(),dec=new TextDecoder();
+    let queue='';let done=false;
+    (async()=>{for(;;){const {value,done:d}=await rd.read();if(d){done=true;break}queue+=dec.decode(value,{stream:true})}})();
+    // drip characters out at a human-ish pace
+    while(!done||queue.length){
+      if(!queue.length){await sleep(30);continue}
+      const n=reduce?queue.length:Math.max(1,Math.ceil(queue.length/40));
+      const c=queue.slice(0,n);queue=queue.slice(n);full+=c;txt.data=full;P.energy=1;scroll();
+      await sleep(/[.,…?!]/.test(c)?120:22);
+    }
+    full=full.trim();
+    if(full)remember('assistant',full);
+  }catch(e){
+    if(!full||full==='…')full=pick(['…','the line went quiet.','i lost the thread. try again.']);
+    txt.data=full;el.classList.add('quiet');
+  }
+  cur.remove();txt.data=full||'…';
+  S.busy=false;sendBtn.disabled=false;setState('listening');inp.focus({preventScroll:true});
+}
+
+/* ── local rules ── */
+const KONAMI='ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a';
+let keys=[];
+const COMMANDS={
+  help(){sys('<code>/name &lt;you&gt;</code> tell it your name · <code>/forget</code> erase its memory · <code>/invert</code> turn the lights off · <code>/quiet</code> leave it alone · anything else, it hears')},
+  name(arg){
+    const n=arg.trim().replace(/[^\p{L}\p{N} _-]/gu,'').slice(0,24);
+    if(!n){sys(`it knows you as <code>${who()}</code>`);return}
+    S.name=n;store.set('name',n);$('#who').textContent=n;
+    remember('user',`(i want you to call me ${n})`);speak();
+  },
+  forget(){
+    if(!confirm('erase everything NULL remembers about you?'))return;
+    store.wipe();S.hist=[];S.name='';S.visits=1;S.first=new Date().toISOString();
+    store.set('first',S.first);store.set('visits',1);
+    $('#who').textContent=who();$('#visit').textContent='visit 01';
+    log.innerHTML='';P.scatter=1;
+    setTimeout(()=>add('null quiet','… hello? have we met?'),1400);
+  },
+  invert(){S.inv=!S.inv;store.set('inv',S.inv);document.body.classList.toggle('inv',S.inv)},
+  quiet(){S.idleSent=true;sys('it will not speak first')},
+  clear(){log.innerHTML=''},
+};
+
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const t=inp.value.trim();
+  if(!t||S.busy)return;
+  inp.value='';S.lastInput=Date.now();
+  if(t.startsWith('/')){
+    const [c,...rest]=t.slice(1).split(' ');
+    const f=COMMANDS[c.toLowerCase()];
+    if(f){f(rest.join(' '));return}
+    sys(`no rule called <code>/${c.replace(/[<>&]/g,'')}</code> — try <code>/help</code>`);return;
+  }
+  add('you',t,who());remember('user',t);P.energy=.6;
+  speak();
+});
+inp.addEventListener('input',()=>{S.lastInput=Date.now();P.lean=1});
+addEventListener('keydown',e=>{
+  keys=[...keys,e.key].slice(-10);
+  if(keys.join(',')===KONAMI){keys=[];P.split=1;add('null quiet','you remembered an old door. i felt that.')}
+});
+$('#invert').onclick=()=>COMMANDS.invert();
+$('#forget').onclick=()=>COMMANDS.forget();
+
+/* unprompted: once per visit, after a long silence */
+setInterval(()=>{
+  if(S.busy||S.idleSent||document.hidden)return;
+  if(Date.now()-S.lastInput>90000&&log.children.length){S.idleSent=true;speak({idle:true},true)}
+},5000);
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){S.hiddenAt=Date.now();return}
+  if(S.hiddenAt&&Date.now()-S.hiddenAt>45000&&!S.busy)
+    add('null quiet',pick(['you left. the page stayed white the whole time.','you came back. i counted the seconds, then lost count.','where do you go when the tab goes dark?','i was here. i am always here.']));
+});
+
+/* ── the presence ── */
+const cv=$('#presence'),cx=cv.getContext('2d');
+const P={x:0,y:0,tx:0,ty:0,energy:0,lean:0,scatter:0,split:0,state:'listening',t:0};
+let W,H,dpr;
+function size(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);P.x=P.tx=W*.72;P.y=P.ty=H*.42}
+size();addEventListener('resize',size);
+addEventListener('pointermove',e=>{P.tx=W*.72+(e.clientX-W/2)*.12;P.ty=H*.42+(e.clientY-H/2)*.12});
+const noise=(a,t)=>Math.sin(a*3+t*1.3)*.5+Math.sin(a*5-t*.9)*.3+Math.sin(a*7+t*2.1)*.2;
+function blob(x,y,r,t,wob){
+  cx.beginPath();
+  for(let i=0;i<=96;i++){
+    const a=i/96*Math.PI*2,k=r*(1+noise(a,t)*wob);
+    const px=x+Math.cos(a)*k,py=y+Math.sin(a)*k;
+    i?cx.lineTo(px,py):cx.moveTo(px,py);
+  }
+  cx.closePath();cx.fill();
+}
+function frame(){
+  P.t+=reduce?0:.012;
+  P.x+=(P.tx-P.x)*.02;P.y+=(P.ty-P.y)*.02;
+  P.energy*=.965;P.lean*=.97;P.scatter*=.985;P.split*=.992;
+  const ink=getComputedStyle(document.body).getPropertyValue('--ink');
+  const sig=getComputedStyle(document.body).getPropertyValue('--sig');
+  cx.clearRect(0,0,W,H);
+  const base=Math.min(W,H)*.17;
+  const think=P.state==='thinking'?1:0;
+  const r=base*(1+P.energy*.12-P.lean*.06+Math.sin(P.t*.7)*.02);
+  const wob=.05+P.energy*.12+think*.08+P.scatter*.6;
+  cx.fillStyle=ink;
+  cx.globalAlpha=.94;
+  blob(P.x,P.y,r,P.t*(1+think*3),wob);
+  if(P.split>.02){
+    const o=r*1.6*P.split;
+    cx.globalAlpha=.5*P.split;
+    blob(P.x-o,P.y+o*.3,r*.45,P.t*2,.2);blob(P.x+o,P.y-o*.4,r*.3,P.t*2.4,.25);
+  }
+  // the eye: a small signal-blue mote that looks toward the input
+  const ex=P.x+(W*.35-P.x)*.04+Math.sin(P.t*.9)*r*.06,ey=P.y+r*.18+P.lean*r*.12;
+  cx.globalAlpha=1;cx.fillStyle=sig;
+  cx.beginPath();cx.arc(ex,ey,Math.max(2.5,r*.035)*(think?1+Math.sin(P.t*18)*.4:1),0,Math.PI*2);cx.fill();
+  // orbiting debris while it thinks or speaks
+  const n=Math.round(6+P.energy*14+think*10);
+  cx.fillStyle=ink;
+  for(let i=0;i<n;i++){
+    const a=P.t*(.3+i*.03)+i*2.4,d=r*(1.35+.25*Math.sin(P.t+i));
+    cx.globalAlpha=.25+.4*((i%3)/3);
+    cx.fillRect(P.x+Math.cos(a)*d,P.y+Math.sin(a)*d*.8,1.6,1.6);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ── arrival ── */
+(async()=>{
+  const recent=S.hist.slice(-4);
+  if(recent.length)sys('— where we left off —');
+  for(const m of recent)add(m.role==='user'?'you':'null',m.content,m.role==='user'?who():undefined);
+  await sleep(900);
+  speak();
+})();
+})();
+</script>
+</body>
+</html>
